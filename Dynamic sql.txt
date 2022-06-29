@@ -1,0 +1,32 @@
+DECLARE
+        CURSOR CHANGE_DEPT_CURSOR IS
+            SELECT TABLE_NAME, COLUMN_NAME, OBJECT_TYPE
+                FROM USER_TAB_COLUMNS, USER_OBJECTS
+                WHERE USER_TAB_COLUMNS.TABLE_NAME = USER_OBJECTS.OBJECT_NAME
+                AND COLUMN_NAME = 'DEPARTMENT_ID'
+                AND OBJECT_TYPE = 'TABLE';
+BEGIN
+        FOR DEPT_RECORD IN CHANGE_DEPT_CURSOR LOOP
+                    EXECUTE IMMEDIATE 'ALTER TABLE '||DEPT_RECORD.TABLE_NAME||' MODIFY DEPARTMENT_ID NUMBER(10)';
+        END LOOP;
+END;
+
+------------------------------
+
+create table : dynamic sql
+grant create any table to hr;
+
+
+declare
+    cursor depts_cursor is
+        select table_name, column_name
+                from user_tab_columns
+                where column_name = 'DEPARTMENT_ID'
+                AND TABLE_NAME IN (SELECT OBJECT_NAME FROM USER_OBJECTS
+               WHERE OBJECT_TYPE = 'TABLE');
+
+begin
+        for depts_record in depts_cursor loop
+           execute immediate 'alter table '|| depts_record.table_name||' modify department_id number(5)';
+        end loop;
+end;
